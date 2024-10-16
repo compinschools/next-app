@@ -1,7 +1,12 @@
+import Header from "@/components/server/header";
+
 export default function NewPage() {
   return (
-    <div>
-      <h1>This is a new Page</h1>
-    </div>
+    <>
+      <Header currentPage="/new-page/folder" />
+      <div>
+        <h1>This is a new Page</h1>
+      </div>
+    </>
   )
 }
