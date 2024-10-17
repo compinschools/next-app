@@ -1,5 +1,4 @@
-export default function Header({currentPage}){
-    console.log("currentPage", currentPage);
+export default async function Header({currentPage}){
     return (
         <header>
             <h1>Header</h1>
