@@ -1,5 +1,4 @@
 
-import Tallys from "@/components/client/tallys";
 import Header from "@/components/server/header";
 import Image from "next/image";
 
@@ -15,7 +14,6 @@ export default async function Home() {
       <Header currentPage="/" />
       <div>
         <h1>Hello World!</h1>
-        <Tallys onSave={save} />
         
       </div>
     </>

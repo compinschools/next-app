@@ -1,10 +1,10 @@
 export default async function Header({currentPage}){
     return (
-        <header>
+        <header className="bg-slate-500 border-b border-b-white p-2 pb-2">
             <h1>Header</h1>
-            <a href="/" className={ currentPage === "/" && "underline"} >Home</a>
-            <a href="/new-page" className={ currentPage === "/new-page" && "underline"} >New Page</a>
-            <a href="/new-page/folder" className={ currentPage === "/new-page/folder" && "underline"}>folder</a>
+            <a href="/" className={` pr-2 ${currentPage === "/" && "underline"}`}>Home</a>
+            <a href="/todo" className={` pr-2 ${currentPage === "/todo" && "underline"}`}>Todo</a>
+            <a href="/new-page/folder" className={` pr-2 ${currentPage === "/new-page-folder" && "underline"}`}>folder</a>
         </header>
     );
 }
