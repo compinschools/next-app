@@ -1,13 +1,15 @@
 "use client"
 import {useState, useEffect} from "react";
+import { ApiClient } from "@/lib/ApiClient";
 
 export default function Fact(){
   const [facts, setFacts] = useState(null);
   
   async function getFacts(){ 
-    const data = await fetch("https://dogapi.dog/api/v2/facts?limit=5");
     
-    const facts = await data.json();
+    const apiClient = new ApiClient();
+    
+    const facts = await apiClient.getFacts();
     console.log("facts",facts);
     setFacts(facts.data);
   }
