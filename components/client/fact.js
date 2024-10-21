@@ -5,9 +5,11 @@ export default function Fact(){
   const [fact, setFact] = useState(null);
   
   async function getFact(){ 
-    const data = await fetch("https://cat-fact.herokuapp.com/facts/random?animal_type=cat&amount=3&json");
+    const data = await fetch("https://dogapi.dog/api/v2/facts?limit=5");
     //const fact = await data.json();
-    setFact(await data.json());
+    const facts = await data.json();
+    console.log(facts);
+    setFact(facts.data);
   }
 
   useEffect(() => {
@@ -21,7 +23,7 @@ export default function Fact(){
 
     return ( <>
     {
-      fact?.map( (f) => <p key={f._id}>{f.text}</p>)
+      fact?.map( (f) => <p className="pt-5" key={f.id}>{f.attributes.body}</p>)
     }
 
     <button className="rounded-md bg-blue-600 p-3" onClick={getFact}>New Fact</button>
