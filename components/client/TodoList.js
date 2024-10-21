@@ -5,11 +5,26 @@ import { useEffect, useState } from "react";
 export default function TodoList() {
 
   const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(0);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editCompleted, setEditCompleted] = useState(false);
+
+  useEffect(() => { 
+    console.log("Loading todos...");
+    let savedTodos = window.localStorage.getItem("todos");
+    if(savedTodos){
+      setTodos(JSON.parse(savedTodos));
+    }
+    setLoading(false);
+  },[]);
+
+  function persistTodos(todos){
+    setTodos(todos);
+    window.localStorage.setItem("todos",JSON.stringify(todos));
+  }
 
   function onSave(todo){
     console.log("Saving...",todo);
@@ -22,7 +37,7 @@ export default function TodoList() {
         }
       });
       todo.id = maxId + 1;
-      setTodos([...todos,todo]);
+      persistTodos([...todos,todo]);
     } else {
       //this is an existing todo, find it and update it 
       let updatedTodos = todos.map((t) => {
@@ -32,7 +47,7 @@ export default function TodoList() {
           return t;
         }
       });
-      setTodos(updatedTodos);
+      persistTodos(updatedTodos);
     }
     
     setShowForm(false);
@@ -52,7 +67,7 @@ export default function TodoList() {
   function onDelete(id) {
     console.log("Deleting...",id);
     let updatedTodos = todos.filter((t) => t.id !== id);
-    setTodos(updatedTodos);
+    persistTodos(updatedTodos);
   }
 
   useEffect(() => {
@@ -61,11 +76,14 @@ export default function TodoList() {
 
   return (
     <>
-      <input type="button" className="rounded-md bg-blue-950 pl-2 pr-2" onClick={() => {setShowForm(!showForm)}} value="Add Todo" />
-      {showForm && <TodoForm onSave={onSave} onCancel={() => setShowForm(false)} _id={editId} _name={editName} _description={editDescription} _completed={editCompleted} />}
+      {!loading && <>
+        <input type="button" className="rounded-md bg-blue-950 pl-2 pr-2" onClick={() => {setShowForm(!showForm)}} value="Add Todo" />
+        {showForm && <TodoForm onSave={onSave} onCancel={() => setShowForm(false)} _id={editId} _name={editName} _description={editDescription} _completed={editCompleted} />}
 
-      {!showForm && todos.map((todo) => <Todo key={todo.id} id={todo.id} name={todo.name} description={todo.description} completed={todo.completed} onEdit={onEdit} onDelete={onDelete} />)}
-
+        {!showForm && todos.map((todo) => <Todo key={todo.id} id={todo.id} name={todo.name} description={todo.description} completed={todo.completed} onEdit={onEdit} onDelete={onDelete} />)}
+      </>
+}
+{loading && <h2>Loading...</h2>}
 
     </>
   );
