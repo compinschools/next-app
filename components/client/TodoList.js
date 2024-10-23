@@ -1,9 +1,8 @@
 "use client"
 import Todo from "./Todo";
 import TodoForm from "./todoForm";
-import { ApiClient } from "@/lib/ApiClient";
 import { useEffect, useState } from "react";
-export default function TodoList() {
+export default function TodoList({onGet,onCreate,onUpdate,onDelete}) {
 
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,25 +19,24 @@ export default function TodoList() {
 
   async function loadTodos(){
     setLoading(true);
-    const apiClient = new ApiClient();
-    const todos = await apiClient.getTodos();
+    
+    const todos = await onGet();
     setTodos(todos);
     setLoading(false);
   }
 
   async function onSave(todo){
     console.log("Saving...",todo);
-    const apiClient = new ApiClient();
     
     if(todo.id == undefined){
-      await apiClient.createTodo(todo);
+      await onCreate(todo);
       
-      loadTodos();
+      await loadTodos();
     } else {
       //this is an existing todo, find it and update it 
-      await apiClient.updateTodo({...todo,_id: todo.id});
+      await onUpdate({...todo,_id: todo.id});
 
-      loadTodos();
+      await loadTodos();
     }
     
     setShowForm(false);
@@ -47,8 +45,7 @@ export default function TodoList() {
 
   async function onEdit(id) {
     console.log("Editing...",id);
-    const apiClient = new ApiClient();
-    const todo = await apiClient.getTodoById(id);
+    const todo = await onGet(id);
     console.log("editing todo",todo);
     setEditId(todo._id);
     setEditTitle(todo.title);
@@ -57,11 +54,18 @@ export default function TodoList() {
     setShowForm(true);
   }
 
-  async function onDelete(id) {
+  async function onDeleteInternal(id) {
     console.log("Deleting...",id);
-    const apiClient = new ApiClient();
-    await apiClient.deleteTodo(id);
+    
+    await onDelete(id);
     loadTodos();
+  }
+
+  function showAddForm(){
+    setShowForm(true);
+    setEditId(null);
+    setEditTitle("");
+    setEditCompleted(false);
   }
 
   useEffect(() => {
@@ -71,10 +75,10 @@ export default function TodoList() {
   return (
     <>
       {!loading && <>
-        <input type="button" className="rounded-md bg-blue-950 pl-2 pr-2" onClick={() => {setShowForm(!showForm)}} value="Add Todo" />
+        <input type="button" className="rounded-md bg-blue-950 pl-2 pr-2" onClick={() => {showAddForm()}} value="Add Todo" />
         {showForm && <TodoForm onSave={onSave} onCancel={() => setShowForm(false)} _id={editId} _title={editTitle} _description={editDescription} _completed={editCompleted} />}
 
-        {!showForm && todos.map((todo) => <Todo key={todo._id} id={todo._id} title={todo.title} description={todo.description} completed={todo.completed} onEdit={onEdit} onDelete={onDelete} />)}
+        {!showForm && todos.map((todo) => <Todo key={todo._id} id={todo._id} title={todo.title} description={todo.description} completed={todo.completed} onEdit={onEdit} onDelete={onDeleteInternal} />)}
       </>
 }
 {loading && <h2>Loading...</h2>}
