@@ -1,9 +1,9 @@
 "use client"
 import { useState,useEffect } from "react";
-export default function TodoForm({onSave,onCancel,_id,_name,_description,_completed}) {
+export default function TodoForm({onSave,onCancel,_id,_title,_description,_completed}) {
 
   const [id, setId] = useState(_id);
-  const [name, setName] = useState(_name);
+  const [title, setTitle] = useState(_title);
   const [description, setDescription] = useState(_description);
   const [completed, setCompleted] = useState(_completed);
 
@@ -17,15 +17,15 @@ export default function TodoForm({onSave,onCancel,_id,_name,_description,_comple
   function onSaveInternal(e){
     e.preventDefault();
     //console.log("Saving...",{id,name,description,completed});
-    onSave({id,name,description,completed});
+    onSave({id,title,description,completed});
   }
 
   return (
     <form className="p-2">
       {/* fields will be name, description and completed (boolean) */}
       <div className="p-2">
-        <label className="block">Name</label>
-        <input className="text-black" type="text" id="name" name="name" onChange={(e) => {setName(e.target.value)}} value={name} />
+        <label className="block">Title</label>
+        <input className="text-black" type="text" id="title" name="title" onChange={(e) => {setTitle(e.target.value)}} value={title} />
       </div>
       <div className="p-2">
       <label className="block">Description</label>

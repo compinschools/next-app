@@ -1,7 +1,7 @@
-export default function Todo({id,name,description,completed,onEdit,onDelete}){
+export default function Todo({id,title,description,completed,onEdit,onDelete}){
     return (
         <div className="p-2 border-b border-slate-500">
-            <h2>{name}</h2>
+            <h2>{title}</h2>
             <p>{description}</p>
             <p>{completed ? "Completed" : "Not Completed"}</p>
 

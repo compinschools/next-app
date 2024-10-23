@@ -1,6 +1,7 @@
 "use client"
 import Todo from "./Todo";
 import TodoForm from "./todoForm";
+import { ApiClient } from "@/lib/ApiClient";
 import { useEffect, useState } from "react";
 export default function TodoList() {
 
@@ -8,66 +9,59 @@ export default function TodoList() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(0);
-  const [editName, setEditName] = useState("");
+  const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editCompleted, setEditCompleted] = useState(false);
 
   useEffect(() => { 
     console.log("Loading todos...");
-    let savedTodos = window.localStorage.getItem("todos");
-    if(savedTodos){
-      setTodos(JSON.parse(savedTodos));
-    }
-    setLoading(false);
+    loadTodos();
   },[]);
 
-  function persistTodos(todos){
+  async function loadTodos(){
+    setLoading(true);
+    const apiClient = new ApiClient();
+    const todos = await apiClient.getTodos();
     setTodos(todos);
-    window.localStorage.setItem("todos",JSON.stringify(todos));
+    setLoading(false);
   }
 
-  function onSave(todo){
+  async function onSave(todo){
     console.log("Saving...",todo);
-    if(todo.id === 0){
-      //find the largest id and increment by 1
-      let maxId = 0;
-      todos.forEach((t) => {
-        if(t.id > maxId){
-          maxId = t.id;
-        }
-      });
-      todo.id = maxId + 1;
-      persistTodos([...todos,todo]);
+    const apiClient = new ApiClient();
+    
+    if(todo.id == undefined){
+      await apiClient.createTodo(todo);
+      
+      loadTodos();
     } else {
       //this is an existing todo, find it and update it 
-      let updatedTodos = todos.map((t) => {
-        if(t.id === todo.id){
-          return todo;
-        } else {
-          return t;
-        }
-      });
-      persistTodos(updatedTodos);
+      await apiClient.updateTodo({...todo,_id: todo.id});
+
+      loadTodos();
     }
     
     setShowForm(false);
     console.log("Saved...",todo);
   }
 
-  function onEdit(id) {
+  async function onEdit(id) {
     console.log("Editing...",id);
-    let todo = todos.find((t) => t.id === id);
-    setEditId(todo.id);
-    setEditName(todo.name);
+    const apiClient = new ApiClient();
+    const todo = await apiClient.getTodoById(id);
+    console.log("editing todo",todo);
+    setEditId(todo._id);
+    setEditTitle(todo.title);
     setEditDescription(todo.description);
     setEditCompleted(todo.completed);
     setShowForm(true);
   }
 
-  function onDelete(id) {
+  async function onDelete(id) {
     console.log("Deleting...",id);
-    let updatedTodos = todos.filter((t) => t.id !== id);
-    persistTodos(updatedTodos);
+    const apiClient = new ApiClient();
+    await apiClient.deleteTodo(id);
+    loadTodos();
   }
 
   useEffect(() => {
@@ -78,9 +72,9 @@ export default function TodoList() {
     <>
       {!loading && <>
         <input type="button" className="rounded-md bg-blue-950 pl-2 pr-2" onClick={() => {setShowForm(!showForm)}} value="Add Todo" />
-        {showForm && <TodoForm onSave={onSave} onCancel={() => setShowForm(false)} _id={editId} _name={editName} _description={editDescription} _completed={editCompleted} />}
+        {showForm && <TodoForm onSave={onSave} onCancel={() => setShowForm(false)} _id={editId} _title={editTitle} _description={editDescription} _completed={editCompleted} />}
 
-        {!showForm && todos.map((todo) => <Todo key={todo.id} id={todo.id} name={todo.name} description={todo.description} completed={todo.completed} onEdit={onEdit} onDelete={onDelete} />)}
+        {!showForm && todos.map((todo) => <Todo key={todo._id} id={todo._id} title={todo.title} description={todo.description} completed={todo.completed} onEdit={onEdit} onDelete={onDelete} />)}
       </>
 }
 {loading && <h2>Loading...</h2>}
