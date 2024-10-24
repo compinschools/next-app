@@ -5,7 +5,7 @@ export default async function Header({currentPage}){
             <a href="/" className={` pr-2 ${currentPage === "/" && "underline"}`}>Home</a>
             <a href="/todo" className={` pr-2 ${currentPage === "/todo" && "underline"}`}>Todo</a>
             <a href="/facts" className={` pr-2 ${currentPage === "/facts" && "underline"}`}>Facts</a>
-            <a href="/new-page/folder" className={` pr-2 ${currentPage === "/new-page-folder" && "underline"}`}>folder</a>
+            <a href="/login" className={` pr-2 ${currentPage === "/login" && "underline"}`}>Login</a>
         </header>
     );
 }
